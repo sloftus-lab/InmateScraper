@@ -98,6 +98,7 @@
               <th>Eyes</th>
               <th>Hair</th>
               <th>Status</th>
+              <th>Released</th>
               <th>Arresting Agency</th>
               <th>Scraped At</th>
             </tr>
@@ -118,10 +119,13 @@
               <td>
                 {% if r.custody_status == 'IN' %}
                   <span class="badge bg-danger">IN</span>
+                {% elif r.custody_status == 'OUT' %}
+                  <span class="badge bg-success">OUT</span>
                 {% elif r.custody_status %}
                   <span class="badge bg-secondary">{{ r.custody_status }}</span>
                 {% endif %}
               </td>
+              <td>{{ r.release_date }}</td>
               <td>{{ r.arresting_agency }}</td>
               <td class="text-muted small">{{ r.scraped_at }}</td>
             </tr>

@@ -72,6 +72,7 @@ CSV_FIELDS = [
     "eye_color",
     "hair_color",
     "custody_status",
+    "release_date",
     "arresting_agency",
 ]
 
@@ -220,6 +221,7 @@ def parse_record(raw: dict, scraped_at: str) -> dict:
         "eye_color":        _field(text, "Eye Color"),
         "hair_color":       _field(text, "Hair Color"),
         "custody_status":   custody,
+        "release_date":     "",
         "arresting_agency": arresting,
     }
 
@@ -250,6 +252,49 @@ def append_rows(rows: list[dict]) -> int:
     return len(rows)
 
 
+def mark_released(active_ids: set[str]) -> list[dict]:
+    """
+    Compare active_ids (currently in jail) against CSV rows marked IN.
+    Any row marked IN that is no longer active gets stamped OUT with today's date.
+    Returns list of newly-released rows.
+    """
+    if not CSV_FILE.exists():
+        return []
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    rows = []
+    released = []
+
+    with open(CSV_FILE, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            iid = row.get("inmate_id", "").strip()
+            if (
+                iid
+                and row.get("custody_status") == "IN"
+                and iid not in active_ids
+                and not row.get("release_date")
+            ):
+                row["custody_status"] = "OUT"
+                row["release_date"]   = today
+                released.append(row)
+            rows.append(row)
+
+    if released:
+        # Rewrite the whole CSV with updated rows
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            writer.writerows(rows)
+        log.info("Marked %d inmate(s) as released.", len(released))
+        for r in released[:5]:
+            log.info("  Released: %s (booked %s)", r["name"], r["booking_date"])
+        if len(released) > 5:
+            log.info("  … and %d more", len(released) - 5)
+
+    return released
+
+
 # ---------------------------------------------------------------------------
 # Static HTML generator
 # ---------------------------------------------------------------------------
@@ -277,10 +322,12 @@ def generate_html():
         is_today = r.get("booking_date") == today
         is_new   = r.get("scraped_at", "") == last_scraped
         row_class = "today-row" if is_today else ("new-row" if is_new else "")
+        status = r.get("custody_status", "")
         status_badge = (
-            '<span class="badge bg-danger">IN</span>' if r.get("custody_status") == "IN"
-            else f'<span class="badge bg-secondary">{r.get("custody_status","")}</span>'
-            if r.get("custody_status") else ""
+            '<span class="badge bg-danger">IN</span>'        if status == "IN"
+            else '<span class="badge bg-success">OUT</span>' if status == "OUT"
+            else f'<span class="badge bg-secondary">{status}</span>' if status
+            else ""
         )
         def e(v): return str(v).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
         rows_html.append(f"""
@@ -296,6 +343,7 @@ def generate_html():
           <td>{e(r.get('eye_color',''))}</td>
           <td>{e(r.get('hair_color',''))}</td>
           <td>{status_badge}</td>
+          <td>{e(r.get('release_date',''))}</td>
           <td>{e(r.get('arresting_agency',''))}</td>
           <td class="text-muted small">{e(r.get('scraped_at',''))}</td>
         </tr>""")
@@ -362,7 +410,7 @@ def generate_html():
             <tr>
               <th>Name</th><th>Booking Date</th><th>Time</th><th>Age</th>
               <th>Gender</th><th>Race</th><th>Height</th><th>Weight</th>
-              <th>Eyes</th><th>Hair</th><th>Status</th>
+              <th>Eyes</th><th>Hair</th><th>Status</th><th>Released</th>
               <th>Arresting Agency</th><th>Scraped At</th>
             </tr>
           </thead>
@@ -399,17 +447,26 @@ def generate_html():
 # Email notifications
 # ---------------------------------------------------------------------------
 
-def send_email(new_rows: list[dict]):
-    """Send an email listing new bookings. Skips silently if credentials missing."""
+def send_email(new_rows: list[dict], released_rows: list[dict] | None = None):
+    """Send an email listing new bookings and/or releases. Skips silently if credentials missing."""
     if not all([EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO]):
         log.debug("Email not configured — skipping.")
         return
 
+    released_rows = released_rows or []
     recipients = [r.strip() for r in EMAIL_TO.split(",") if r.strip()]
-    count = len(new_rows)
-    subject = f"Penobscot Jail: {count} new booking{'s' if count != 1 else ''}"
+    new_count = len(new_rows)
+    rel_count = len(released_rows)
 
-    rows_html = "".join(f"""
+    parts = []
+    if new_count:
+        parts.append(f"{new_count} new booking{'s' if new_count != 1 else ''}")
+    if rel_count:
+        parts.append(f"{rel_count} release{'s' if rel_count != 1 else ''}")
+    subject = f"Penobscot Jail: {', '.join(parts)}" if parts else "Penobscot Jail: update"
+
+    def booking_table(rows):
+        row_cells = "".join(f"""
         <tr>
           <td style="padding:6px 12px;border-bottom:1px solid #eee"><strong>{r['name']}</strong></td>
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['booking_date']}</td>
@@ -418,17 +475,13 @@ def send_email(new_rows: list[dict]):
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['gender']}</td>
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['height']}</td>
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['weight']}</td>
-        </tr>""" for r in new_rows)
-
-    body = f"""
-    <html><body style="font-family:sans-serif;color:#333">
-      <h2 style="color:#1a2e44">&#x1F512; Penobscot County Jail — New Bookings</h2>
-      <p><strong>{count} new booking{'s' if count != 1 else ''}</strong> detected at {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+        </tr>""" for r in rows)
+        return f"""
       <table style="border-collapse:collapse;width:100%;font-size:14px">
         <thead>
           <tr style="background:#1a2e44;color:white">
             <th style="padding:8px 12px;text-align:left">Name</th>
-            <th style="padding:8px 12px;text-align:left">Date</th>
+            <th style="padding:8px 12px;text-align:left">Booked</th>
             <th style="padding:8px 12px;text-align:left">Time</th>
             <th style="padding:8px 12px;text-align:left">Age</th>
             <th style="padding:8px 12px;text-align:left">Gender</th>
@@ -436,9 +489,49 @@ def send_email(new_rows: list[dict]):
             <th style="padding:8px 12px;text-align:left">Weight</th>
           </tr>
         </thead>
-        <tbody>{rows_html}</tbody>
-      </table>
-      <p style="margin-top:20px">
+        <tbody>{row_cells}</tbody>
+      </table>"""
+
+    def release_table(rows):
+        row_cells = "".join(f"""
+        <tr>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee"><strong>{r['name']}</strong></td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['booking_date']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['release_date']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['age']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['gender']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r.get('arresting_agency','')}</td>
+        </tr>""" for r in rows)
+        return f"""
+      <table style="border-collapse:collapse;width:100%;font-size:14px">
+        <thead>
+          <tr style="background:#4a6741;color:white">
+            <th style="padding:8px 12px;text-align:left">Name</th>
+            <th style="padding:8px 12px;text-align:left">Booked</th>
+            <th style="padding:8px 12px;text-align:left">Released</th>
+            <th style="padding:8px 12px;text-align:left">Age</th>
+            <th style="padding:8px 12px;text-align:left">Gender</th>
+            <th style="padding:8px 12px;text-align:left">Agency</th>
+          </tr>
+        </thead>
+        <tbody>{row_cells}</tbody>
+      </table>"""
+
+    sections = []
+    if new_count:
+        sections.append(f"""
+      <h2 style="color:#1a2e44;margin-top:0">&#x1F512; New Bookings ({new_count})</h2>
+      {booking_table(new_rows)}""")
+    if rel_count:
+        sections.append(f"""
+      <h2 style="color:#4a6741;margin-top:28px">&#x2705; Releases ({rel_count})</h2>
+      {release_table(released_rows)}""")
+
+    body = f"""
+    <html><body style="font-family:sans-serif;color:#333;max-width:800px;margin:0 auto;padding:20px">
+      <p style="color:#666;font-size:13px">Detected at {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+      {''.join(sections)}
+      <p style="margin-top:24px;font-size:13px">
         <a href="https://sloftus-lab.github.io/InmateScraper/" style="color:#1a2e44">View full roster →</a>
       </p>
     </body></html>"""
@@ -522,13 +615,19 @@ def run_scrape() -> dict:
     else:
         log.info("No new bookings.")
 
+    # Check for releases — anyone marked IN who isn't in the current API response
+    active_ids = {raw.get("inmateID", "") for raw in raw_records if raw.get("inmateID")}
+    released_rows = mark_released(active_ids)
+
     generate_html()
 
     return {
-        "total_fetched": len(raw_records),
-        "new_count": len(new_rows),
-        "new_rows": new_rows,
-        "error": None,
+        "total_fetched":  len(raw_records),
+        "new_count":      len(new_rows),
+        "new_rows":       new_rows,
+        "released_count": len(released_rows),
+        "released_rows":  released_rows,
+        "error":          None,
     }
 
 
@@ -542,27 +641,36 @@ def main():
     if result["error"]:
         sys.exit(1)
     n = result["new_count"]
-    if n:
-        names = ", ".join(r["name"] for r in result["new_rows"][:3])
-        suffix = f" + {n - 3} more" if n > 3 else ""
-        notify(
-            "Penobscot Inmate Roster",
-            f"{n} new booking{'s' if n != 1 else ''}: {names}{suffix}",
-        )
-        send_email(result["new_rows"])
+    r = result.get("released_count", 0)
+    if n or r:
+        notify_parts = []
+        if n:
+            names = ", ".join(row["name"] for row in result["new_rows"][:3])
+            suffix = f" + {n - 3} more" if n > 3 else ""
+            notify_parts.append(f"{n} new: {names}{suffix}")
+        if r:
+            notify_parts.append(f"{r} released")
+        notify("Penobscot Inmate Roster", " · ".join(notify_parts))
+        send_email(result["new_rows"], result.get("released_rows", []))
 
 
 def test_email():
     """Send a test email without running the scraper."""
     configure_logging(also_stream=True)
     log.info("Sending test email to %s", EMAIL_TO)
-    fake_rows = [{
+    fake_bookings = [{
         "name": "TEST BOOKING",
         "booking_date": datetime.now().strftime("%Y-%m-%d"),
         "booking_time": datetime.now().strftime("%H:%M EDT"),
         "age": "35", "gender": "M", "height": "5 ft 10in(s)", "weight": "180 lbs",
     }]
-    send_email(fake_rows)
+    fake_releases = [{
+        "name": "TEST RELEASE",
+        "booking_date": "2026-04-01",
+        "release_date": datetime.now().strftime("%Y-%m-%d"),
+        "age": "28", "gender": "F", "arresting_agency": "Bangor PD",
+    }]
+    send_email(fake_bookings, fake_releases)
 
 
 if __name__ == "__main__":
