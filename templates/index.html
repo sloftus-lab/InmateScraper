@@ -19,6 +19,8 @@
     .spin { animation: spin 1s linear infinite; display: inline-block; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     th { white-space: nowrap; }
+    .capacity-bar-wrap { background: #e9ecef; border-radius: 6px; height: 10px; margin-top: 8px; }
+    .capacity-bar { height: 10px; border-radius: 6px; transition: width 0.4s; }
   </style>
 </head>
 <body>
@@ -34,22 +36,32 @@
 
   <!-- Stats row -->
   <div class="row g-3 mb-4">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Total in CSV</div>
         <div class="display-6 text-primary" id="stat-total">{{ total }}</div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Currently In Custody</div>
         <div class="display-6 text-danger" id="stat-custody">{{ in_custody }}</div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Booked Today</div>
         <div class="display-6 text-success" id="stat-today">{{ booked_today }}</div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card stat-card shadow-sm text-center p-3">
+        <div class="text-muted small mb-1">Jail Capacity (157)</div>
+        <div class="display-6 {% if capacity_pct >= 100 %}text-danger{% elif capacity_pct >= 80 %}text-warning{% else %}text-success{% endif %}" id="stat-capacity">{{ capacity_pct }}%</div>
+        <div class="capacity-bar-wrap mt-1">
+          <div class="capacity-bar {% if capacity_pct >= 100 %}bg-danger{% elif capacity_pct >= 80 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ [capacity_pct, 100] | min }}%"></div>
+        </div>
+        <div class="text-muted small mt-1">{{ in_custody }} / 157</div>
       </div>
     </div>
   </div>

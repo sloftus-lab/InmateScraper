@@ -308,11 +308,15 @@ def generate_html():
         with open(CSV_FILE, newline="", encoding="utf-8") as f:
             inmates = list(csv.DictReader(f))
 
+    JAIL_CAPACITY = 157
     today = datetime.now().strftime("%Y-%m-%d")
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     total = len(inmates)
     in_custody   = sum(1 for r in inmates if r.get("custody_status") == "IN")
     booked_today = sum(1 for r in inmates if r.get("booking_date") == today)
+    capacity_pct = round(in_custody / JAIL_CAPACITY * 100)
+    cap_color = "danger" if capacity_pct >= 100 else "warning" if capacity_pct >= 80 else "success"
+    cap_width = min(capacity_pct, 100)
 
     # Newest scraped_at timestamp = records added in the last run
     last_scraped = max((r.get("scraped_at", "") for r in inmates), default="")
@@ -367,6 +371,7 @@ def generate_html():
     tr.today-row td {{ background:#fff8e1 !important; }}
     tr.new-row td {{ background:#e8f5e9 !important; }}
     th {{ white-space:nowrap; }}
+    :root {{ --bs-success:#198754; --bs-warning:#ffc107; --bs-danger:#dc3545; }}
   </style>
 </head>
 <body>
@@ -378,22 +383,32 @@ def generate_html():
 </nav>
 <div class="container-fluid px-4">
   <div class="row g-3 mb-4">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Total Records</div>
         <div class="display-6 text-primary">{total}</div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Currently In Custody</div>
         <div class="display-6 text-danger">{in_custody}</div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Booked Today</div>
         <div class="display-6 text-success">{booked_today}</div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card stat-card shadow-sm text-center p-3">
+        <div class="text-muted small mb-1">Jail Capacity ({JAIL_CAPACITY})</div>
+        <div class="display-6 text-{cap_color}">{capacity_pct}%</div>
+        <div style="background:#e9ecef;border-radius:6px;height:10px;margin-top:8px">
+          <div style="background:var(--bs-{cap_color});width:{cap_width}%;height:10px;border-radius:6px"></div>
+        </div>
+        <div class="text-muted small mt-1">{in_custody} / {JAIL_CAPACITY}</div>
       </div>
     </div>
   </div>
@@ -447,7 +462,7 @@ def generate_html():
 # Email notifications
 # ---------------------------------------------------------------------------
 
-def send_email(new_rows: list[dict], released_rows: list[dict] | None = None):
+def send_email(new_rows: list[dict], released_rows=None):
     """Send an email listing new bookings and/or releases. Skips silently if credentials missing."""
     if not all([EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO]):
         log.debug("Email not configured — skipping.")
