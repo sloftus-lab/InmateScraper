@@ -552,5 +552,21 @@ def main():
         send_email(result["new_rows"])
 
 
+def test_email():
+    """Send a test email without running the scraper."""
+    configure_logging(also_stream=True)
+    log.info("Sending test email to %s", EMAIL_TO)
+    fake_rows = [{
+        "name": "TEST BOOKING",
+        "booking_date": datetime.now().strftime("%Y-%m-%d"),
+        "booking_time": datetime.now().strftime("%H:%M EDT"),
+        "age": "35", "gender": "M", "height": "5 ft 10in(s)", "weight": "180 lbs",
+    }]
+    send_email(fake_rows)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "--test-email":
+        test_email()
+    else:
+        main()
