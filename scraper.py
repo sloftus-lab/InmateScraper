@@ -331,9 +331,9 @@ def generate_html():
       </div>
     </div>
   </div>
-  <div class="alert alert-info py-2 small">
-    This is a static snapshot generated at <strong>{generated_at}</strong>.
-    Re-run the scraper to refresh.
+  <div class="alert alert-info py-2 d-flex justify-content-between align-items-center">
+    <span>&#x1F551; Last updated: <strong>{generated_at}</strong></span>
+    <span class="text-muted small">Auto-refreshes every hour &nbsp;·&nbsp; <a href="https://github.com/sloftus-lab/InmateScraper/actions" target="_blank" class="alert-link">Run manually on GitHub</a></span>
   </div>
   <div class="card shadow-sm mb-5">
     <div class="card-header"><strong>Inmate Records</strong></div>
