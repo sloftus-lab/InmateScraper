@@ -71,6 +71,7 @@ def _render_index(run_msg=None, run_error=False):
     total        = len(inmates)
     booked_today = sum(1 for r in inmates if r.get("booking_date") == today)
     in_custody   = sum(1 for r in inmates if r.get("custody_status") == "IN")
+    boarded_out  = sum(1 for r in inmates if r.get("custody_status") == "BO")
     capacity_pct = round(in_custody / JAIL_CAPACITY * 100)
     last_scraped = max((r.get("scraped_at", "") for r in inmates), default=None)
     return render_template(
@@ -79,6 +80,7 @@ def _render_index(run_msg=None, run_error=False):
         total=total,
         booked_today=booked_today,
         in_custody=in_custody,
+        boarded_out=boarded_out,
         capacity_pct=capacity_pct,
         last_scraped=last_scraped,
         last_run={"at": last_scraped, "total_fetched": total, "new_count": 0, "error": None},

@@ -313,10 +313,12 @@ def generate_html():
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     total = len(inmates)
     in_custody   = sum(1 for r in inmates if r.get("custody_status") == "IN")
+    boarded_out  = sum(1 for r in inmates if r.get("custody_status") == "BO")
     booked_today = sum(1 for r in inmates if r.get("booking_date") == today)
     capacity_pct = round(in_custody / JAIL_CAPACITY * 100)
     cap_color = "danger" if capacity_pct >= 100 else "warning" if capacity_pct >= 80 else "success"
     cap_width = min(capacity_pct, 100)
+    boarded_note = f" &nbsp;·&nbsp; {boarded_out} boarded out" if boarded_out else ""
 
     # Newest scraped_at timestamp = records added in the last run
     last_scraped = max((r.get("scraped_at", "") for r in inmates), default="")
@@ -328,9 +330,10 @@ def generate_html():
         row_class = "today-row" if is_today else ("new-row" if is_new else "")
         status = r.get("custody_status", "")
         status_badge = (
-            '<span class="badge bg-danger">IN</span>'        if status == "IN"
-            else '<span class="badge bg-success">OUT</span>' if status == "OUT"
-            else f'<span class="badge bg-secondary">{status}</span>' if status
+            '<span class="badge bg-danger">IN</span>'                                    if status == "IN"
+            else '<span class="badge bg-success">OUT</span>'                             if status == "OUT"
+            else '<span class="badge" style="background:#6f42c1">BOARDED OUT</span>'    if status == "BO"
+            else f'<span class="badge bg-secondary">{status}</span>'                     if status
             else ""
         )
         def e(v): return str(v).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
@@ -408,7 +411,7 @@ def generate_html():
         <div style="background:#e9ecef;border-radius:6px;height:10px;margin-top:8px">
           <div style="background:var(--bs-{cap_color});width:{cap_width}%;height:10px;border-radius:6px"></div>
         </div>
-        <div class="text-muted small mt-1">{in_custody} / {JAIL_CAPACITY}</div>
+        <div class="text-muted small mt-1">{in_custody} / {JAIL_CAPACITY}{boarded_note}</div>
       </div>
     </div>
   </div>

@@ -61,7 +61,7 @@
         <div class="capacity-bar-wrap mt-1">
           <div class="capacity-bar {% if capacity_pct >= 100 %}bg-danger{% elif capacity_pct >= 80 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ [capacity_pct, 100] | min }}%"></div>
         </div>
-        <div class="text-muted small mt-1">{{ in_custody }} / 157</div>
+        <div class="text-muted small mt-1">{{ in_custody }} / 157{% if boarded_out %} &nbsp;·&nbsp; {{ boarded_out }} boarded out{% endif %}</div>
       </div>
     </div>
   </div>
@@ -133,6 +133,8 @@
                   <span class="badge bg-danger">IN</span>
                 {% elif r.custody_status == 'OUT' %}
                   <span class="badge bg-success">OUT</span>
+                {% elif r.custody_status == 'BO' %}
+                  <span class="badge bg-purple" style="background:#6f42c1">BOARDED OUT</span>
                 {% elif r.custody_status %}
                   <span class="badge bg-secondary">{{ r.custody_status }}</span>
                 {% endif %}
