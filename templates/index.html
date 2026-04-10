@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Penobscot County Inmate Roster</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <style>
+    body { background: #f4f6f9; }
+    .navbar { background: #1a2e44 !important; }
+    .stat-card { border: none; border-radius: 10px; }
+    .stat-card .display-6 { font-weight: 700; }
+    .badge-today { background: #0d6efd; }
+    tr.today-row td { background: #fff8e1 !important; }
+    tr.new-row td { background: #e8f5e9 !important; }
+    #log-box { font-size: 0.78rem; background: #1e1e1e; color: #d4d4d4;
+                border-radius: 8px; padding: 12px; height: 280px; overflow-y: auto; white-space: pre; }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    th { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark mb-4">
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold">🔒 Penobscot County Sheriff — Inmate Roster</span>
+    <span class="text-light small" id="clock"></span>
+  </div>
+</nav>
+
+<div class="container-fluid px-4">
+
+  <!-- Stats row -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <div class="card stat-card shadow-sm text-center p-3">
+        <div class="text-muted small mb-1">Total in CSV</div>
+        <div class="display-6 text-primary" id="stat-total">{{ total }}</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card stat-card shadow-sm text-center p-3">
+        <div class="text-muted small mb-1">Currently In Custody</div>
+        <div class="display-6 text-danger" id="stat-custody">{{ in_custody }}</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card stat-card shadow-sm text-center p-3">
+        <div class="text-muted small mb-1">Booked Today</div>
+        <div class="display-6 text-success" id="stat-today">{{ booked_today }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+      <form method="POST" action="/run" style="display:inline">
+        <button type="submit" class="btn btn-primary">▶ Run Scraper Now</button>
+      </form>
+      <span class="text-muted small">
+        {% if run_msg %}<span class="{{ 'text-success' if not run_error else 'text-danger' }}">{{ run_msg }}</span>{% endif %}
+        {% if last_run.at %}  &nbsp;·&nbsp; Last run: {{ last_run.at }} — fetched {{ last_run.total_fetched }}, new {{ last_run.new_count }}{% endif %}
+      </span>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="text-muted small">Auto-refresh:</span>
+        <select id="refresh-select" class="form-select form-select-sm w-auto" onchange="setAutoRefresh(this.value)">
+          <option value="0">Off</option>
+          <option value="60" selected>1 min</option>
+          <option value="300">5 min</option>
+          <option value="600">10 min</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main table -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Inmate Records</strong>
+      <span class="badge bg-secondary" id="tbl-count">{{ total }} records</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="inmates-table" class="table table-hover table-sm mb-0 align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Name</th>
+              <th>Booking Date</th>
+              <th>Time</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Race</th>
+              <th>Height</th>
+              <th>Weight</th>
+              <th>Eyes</th>
+              <th>Hair</th>
+              <th>Status</th>
+              <th>Arresting Agency</th>
+              <th>Scraped At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in inmates %}
+            <tr class="{% if r.booking_date == today %}today-row{% endif %} {% if r.scraped_at == last_run.at %}new-row{% endif %}">
+              <td class="fw-semibold">{{ r.name }}</td>
+              <td>{{ r.booking_date }}</td>
+              <td>{{ r.booking_time }}</td>
+              <td>{{ r.age }}</td>
+              <td>{{ r.gender }}</td>
+              <td>{{ r.race }}</td>
+              <td>{{ r.height }}</td>
+              <td>{{ r.weight }}</td>
+              <td>{{ r.eye_color }}</td>
+              <td>{{ r.hair_color }}</td>
+              <td>
+                {% if r.custody_status == 'IN' %}
+                  <span class="badge bg-danger">IN</span>
+                {% elif r.custody_status %}
+                  <span class="badge bg-secondary">{{ r.custody_status }}</span>
+                {% endif %}
+              </td>
+              <td>{{ r.arresting_agency }}</td>
+              <td class="text-muted small">{{ r.scraped_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log viewer -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Scraper Log</strong>
+      <button class="btn btn-sm btn-outline-secondary" onclick="loadLogs()">Refresh</button>
+    </div>
+    <div class="card-body p-2">
+      <div id="log-box">Loading…</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- Legend -->
+<div class="container-fluid px-4 pb-4">
+  <small class="text-muted">
+    <span class="badge" style="background:#fff8e1;color:#333;border:1px solid #ddd">Yellow</span> = booked today &nbsp;
+    <span class="badge" style="background:#e8f5e9;color:#333;border:1px solid #ddd">Green</span> = new since last run &nbsp;
+    Scheduler: hourly via Claude scheduled tasks
+  </small>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+  // DataTable
+  const dt = $('#inmates-table').DataTable({
+    order: [[1, 'desc'], [2, 'desc']],
+    pageLength: 25,
+    language: { search: 'Filter:' },
+    drawCallback: () => {
+      $('#tbl-count').text(dt.rows({ search: 'applied' }).count() + ' records');
+    }
+  });
+
+  // Live clock
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleString();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Auto-refresh page
+  let _refreshTimer = null;
+  function setAutoRefresh(secs) {
+    clearInterval(_refreshTimer);
+    if (+secs > 0) _refreshTimer = setInterval(() => location.reload(), +secs * 1000);
+  }
+  setAutoRefresh(60); // default 1 min
+
+  const API = 'http://localhost:5001';
+
+  // Logs
+  function loadLogs() {
+    fetch(API + '/api/logs').then(r => r.json()).then(d => {
+      const box = document.getElementById('log-box');
+      box.textContent = d.log || '(empty)';
+      box.scrollTop = box.scrollHeight;
+    });
+  }
+  loadLogs();
+  setInterval(loadLogs, 30000);
+</script>
+</body>
+</html>

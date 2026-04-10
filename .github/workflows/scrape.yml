@@ -1,0 +1,43 @@
+name: Scrape Inmate Roster
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # every hour
+  workflow_dispatch:        # manual "Run Now" button in GitHub UI
+
+permissions:
+  contents: write           # needed to commit updated CSV + HTML
+  pages: write
+  id-token: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Copy roster to docs/index.html for GitHub Pages
+        run: |
+          mkdir -p docs
+          cp roster.html docs/index.html
+
+      - name: Commit and push changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add inmates.csv roster.html docs/index.html
+          git diff --staged --quiet || git commit -m "scrape: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
