@@ -10,12 +10,23 @@ Run:   python3 scraper.py
 import csv
 import json
 import logging
+import os
 import re
+import smtplib
+
+# Load .env if present (local dev)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(override=False)
+except ImportError:
+    pass
 import subprocess
 import sys
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from html.parser import HTMLParser
 from pathlib import Path
 from time import sleep
@@ -29,6 +40,13 @@ API_KEY   = "SbRiICL5la3daytBtRL2K26xorlmbPXZ3jPQLVzR"
 API_LIMIT = 100
 CSV_FILE  = Path(__file__).parent / "inmates.csv"
 LOG_FILE  = Path(__file__).parent / "scraper.log"
+
+# Email — read from environment variables (set in .env locally, GitHub Secrets in Actions)
+EMAIL_FROM     = os.environ.get("INMATE_EMAIL_FROM", "")
+EMAIL_PASSWORD = os.environ.get("INMATE_EMAIL_PASSWORD", "")
+EMAIL_TO       = os.environ.get("INMATE_EMAIL_TO", "")   # comma-separated
+SMTP_HOST      = "smtp.gmail.com"
+SMTP_PORT      = 587
 
 HEADERS = {
     "x-api-key":  API_KEY,
@@ -378,6 +396,70 @@ def generate_html():
 
 
 # ---------------------------------------------------------------------------
+# Email notifications
+# ---------------------------------------------------------------------------
+
+def send_email(new_rows: list[dict]):
+    """Send an email listing new bookings. Skips silently if credentials missing."""
+    if not all([EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO]):
+        log.debug("Email not configured — skipping.")
+        return
+
+    recipients = [r.strip() for r in EMAIL_TO.split(",") if r.strip()]
+    count = len(new_rows)
+    subject = f"Penobscot Jail: {count} new booking{'s' if count != 1 else ''}"
+
+    rows_html = "".join(f"""
+        <tr>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee"><strong>{r['name']}</strong></td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['booking_date']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['booking_time']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['age']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['gender']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['height']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['weight']}</td>
+        </tr>""" for r in new_rows)
+
+    body = f"""
+    <html><body style="font-family:sans-serif;color:#333">
+      <h2 style="color:#1a2e44">&#x1F512; Penobscot County Jail — New Bookings</h2>
+      <p><strong>{count} new booking{'s' if count != 1 else ''}</strong> detected at {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+      <table style="border-collapse:collapse;width:100%;font-size:14px">
+        <thead>
+          <tr style="background:#1a2e44;color:white">
+            <th style="padding:8px 12px;text-align:left">Name</th>
+            <th style="padding:8px 12px;text-align:left">Date</th>
+            <th style="padding:8px 12px;text-align:left">Time</th>
+            <th style="padding:8px 12px;text-align:left">Age</th>
+            <th style="padding:8px 12px;text-align:left">Gender</th>
+            <th style="padding:8px 12px;text-align:left">Height</th>
+            <th style="padding:8px 12px;text-align:left">Weight</th>
+          </tr>
+        </thead>
+        <tbody>{rows_html}</tbody>
+      </table>
+      <p style="margin-top:20px">
+        <a href="https://sloftus-lab.github.io/InmateScraper/" style="color:#1a2e44">View full roster →</a>
+      </p>
+    </body></html>"""
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"]    = EMAIL_FROM
+    msg["To"]      = ", ".join(recipients)
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            smtp.starttls()
+            smtp.login(EMAIL_FROM, EMAIL_PASSWORD)
+            smtp.sendmail(EMAIL_FROM, recipients, msg.as_string())
+        log.info("Email sent to %s", ", ".join(recipients))
+    except Exception as e:
+        log.error("Email failed: %s", e)
+
+
+# ---------------------------------------------------------------------------
 # macOS notifications
 # ---------------------------------------------------------------------------
 
@@ -467,6 +549,7 @@ def main():
             "Penobscot Inmate Roster",
             f"{n} new booking{'s' if n != 1 else ''}: {names}{suffix}",
         )
+        send_email(result["new_rows"])
 
 
 if __name__ == "__main__":
