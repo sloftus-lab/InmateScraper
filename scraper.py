@@ -481,7 +481,7 @@ def send_email(new_rows: list[dict], released_rows=None):
         parts.append(f"{new_count} new booking{'s' if new_count != 1 else ''}")
     if rel_count:
         parts.append(f"{rel_count} release{'s' if rel_count != 1 else ''}")
-    subject = f"Penobscot Jail: {', '.join(parts)}" if parts else "Penobscot Jail: update"
+    subject = f"Penobscot Jail: {', '.join(parts)}" if parts else "Penobscot Jail: No new bookings or releases"
 
     def booking_table(rows):
         row_cells = "".join(f"""
@@ -544,6 +544,9 @@ def send_email(new_rows: list[dict], released_rows=None):
         sections.append(f"""
       <h2 style="color:#4a6741;margin-top:28px">&#x2705; Releases ({rel_count})</h2>
       {release_table(released_rows)}""")
+    if not new_count and not rel_count:
+        sections.append("""
+      <p style="font-size:16px;color:#666">No new bookings or releases since the last check.</p>""")
 
     body = f"""
     <html><body style="font-family:sans-serif;color:#333;max-width:800px;margin:0 auto;padding:20px">
@@ -669,7 +672,7 @@ def main():
         if r:
             notify_parts.append(f"{r} released")
         notify("Penobscot Inmate Roster", " · ".join(notify_parts))
-        send_email(result["new_rows"], result.get("released_rows", []))
+    send_email(result["new_rows"], result.get("released_rows", []))
 
 
 def test_email():
