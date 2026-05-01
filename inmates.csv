@@ -335,7 +335,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-04-29T09:00:19,80957,HEATHER A WATSON,2026-04-29,02:45:00 EDT,5 ft 04in(s),118 lbs,F,W,42,BLU,BRO,OUT,2026-04-29,Bangor Police Department
 2026-04-29T13:00:27,737332,DESTINEY E ROBBINS,2026-04-29,07:40:00 EDT,5 ft 06in(s),145 lbs,F,W,29,HAZ,BRO,OUT,2026-04-30,Bangor Police Department
 2026-04-29T21:00:16,19435,ALBERT H TENNEY,2026-04-29,14:35:00 EDT,5 ft 05in(s),150 lbs,M,W,55,BLU,BRO,IN,,Bangor Police Department
-2026-04-29T23:00:17,562827,NATHAN ANTHONY MALO,2026-04-29,16:30:00 EDT,5 ft 11in(s),190 lbs,M,W,27,BRO,GRY,IN,,Old Town Police Department
+2026-04-29T23:00:17,562827,NATHAN ANTHONY MALO,2026-04-29,16:30:00 EDT,5 ft 11in(s),190 lbs,M,W,27,BRO,GRY,OUT,2026-05-01,Old Town Police Department
 2026-04-30T00:00:18,762497,ETHAN DUPRAS,2026-04-29,17:30:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,20,Currently Unavailable,Currently Unavailable,OUT,2026-04-30,Orono Police Department
 2026-04-30T00:00:18,649192,NICHOLAS CLAYTON MYERS,2026-04-29,17:20:00 EDT,5 ft 06in(s),125 lbs,M,W,28,BLU,BLN,OUT,2026-04-30,Bangor Police Department
 2026-04-30T00:00:18,811046,KENDRA ARROYO,2026-04-29,17:20:00 EDT,5 ft 04in(s),200 lbs,F,B,24,BLU,BRO,OUT,2026-04-30,Bangor Police Department
