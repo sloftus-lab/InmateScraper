@@ -25,6 +25,7 @@ import sys
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from html.parser import HTMLParser
@@ -550,7 +551,7 @@ def send_email(new_rows: list[dict], released_rows=None):
 
     body = f"""
     <html><body style="font-family:sans-serif;color:#333;max-width:800px;margin:0 auto;padding:20px">
-      <p style="color:#666;font-size:13px">Detected at {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+      <p style="color:#666;font-size:13px">Detected at {datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET')}</p>
       {''.join(sections)}
       <p style="margin-top:24px;font-size:13px">
         <a href="https://sloftus-lab.github.io/InmateScraper/" style="color:#1a2e44">View full roster →</a>
