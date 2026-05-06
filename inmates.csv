@@ -382,4 +382,5 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-05T19:00:22,814597,LISA ANNE HALL,2026-05-05,12:30:00 EDT,5 ft 02in(s),Currently Unavailable,F,W,61,BRO,BRO,IN,,
 2026-05-05T21:00:22,383145,WILLIAM ALEXANDER HANCOCK,2026-05-05,15:10:00 EDT,6 ft 01in(s),230 lbs,M,W,46,BRO,BRO,IN,,Bangor Police Department
 2026-05-05T21:00:22,542152,TONYA MARIE ALICEA,2026-05-05,14:40:00 EDT,5 ft 00in(s),150 lbs,F,W,39,BRO,BRO,IN,,Waldo County Sheriff's Department
-2026-05-06T00:00:20,683945,LUIS KURS,2026-05-05,17:40:00 EDT,5 ft 10in(s),150 lbs,M,W,69,BRO,BRO,IN,,Holden Police Department
+2026-05-06T00:00:20,683945,LUIS KURS,2026-05-05,17:40:00 EDT,5 ft 10in(s),150 lbs,M,W,69,BRO,BRO,OUT,2026-05-06,Holden Police Department
+2026-05-06T03:00:13,722735,CHRISTOPHER K GENGE,2026-05-05,21:00:00 EDT,6 ft 03in(s),200 lbs,M,W,45,BLU,BRO,IN,,Bangor Police Department
