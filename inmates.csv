@@ -369,7 +369,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-04T06:00:14,849451,CONNOR JAMES HORTON,2026-05-03,22:45:00 EDT,5 ft 09in(s),131 lbs,M,W,18,HAZ,BRO,OUT,2026-05-04,Bangor Police Department
 2026-05-04T17:00:24,861683,WAYNE J BUCHANAN,2026-05-04,11:10:00 EDT,5 ft 09in(s),185 lbs,M,W,71,HAZ,GRY,OUT,2026-05-04,Lincoln Police Department
 2026-05-04T19:00:15,535895,LOGAN A ESTY,2026-05-04,12:55:00 EDT,5 ft 10in(s),140 lbs,M,W,19,BLU,BRO,OUT,2026-05-06,Brewer Police Department
-2026-05-05T00:00:14,862178,HUNTER PHILLIPS,2026-05-04,18:10:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,W,38,Currently Unavailable,Currently Unavailable,IN,,Penobscot County Sheriff's Office
+2026-05-05T00:00:14,862178,HUNTER PHILLIPS,2026-05-04,18:10:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,W,38,Currently Unavailable,Currently Unavailable,OUT,2026-05-07,Penobscot County Sheriff's Office
 2026-05-05T02:00:14,569455,TEALA L ARNOLD,2026-05-04,20:00:00 EDT,5 ft 03in(s),127 lbs,F,B,38,BRO,BRO,IN,,Bangor Police Department
 2026-05-05T02:00:14,538509,JESSE ALLEN WOOD,2026-05-04,19:50:00 EDT,5 ft 09in(s),150 lbs,M,W,32,BLU,BLN,OUT,2026-05-05,Bangor Police Department
 2026-05-05T03:00:14,12042,JOHN O CARDOZA,2026-05-04,21:15:00 EDT,5 ft 08in(s),160 lbs,M,W,61,BRO,GRY,OUT,2026-05-05,Bangor Police Department
@@ -379,7 +379,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-05T08:00:14,832529,CINDY GAVIRIA,2026-05-05,02:10:00 EDT,5 ft 07in(s),140 lbs,F,B,47,BRO,BLK,IN,,Bangor Police Department
 2026-05-05T17:00:19,283975,STEVEN WADE SPRINGER,2026-05-05,11:20:00 EDT,6 ft 01in(s),220 lbs,M,W,41,HAZ,BRO,IN,,Bangor Police Department
 2026-05-05T17:00:19,436045,JEREMY JAMES MAYNARD,2026-05-05,08:50:00 EDT,5 ft 08in(s),160 lbs,M,W,35,HAZ,BRO,OUT,2026-05-06,Bangor Police Department
-2026-05-05T19:00:22,814597,LISA ANNE HALL,2026-05-05,12:30:00 EDT,5 ft 02in(s),Currently Unavailable,F,W,61,BRO,BRO,IN,,
+2026-05-05T19:00:22,814597,LISA ANNE HALL,2026-05-05,12:30:00 EDT,5 ft 02in(s),Currently Unavailable,F,W,61,BRO,BRO,OUT,2026-05-07,
 2026-05-05T21:00:22,383145,WILLIAM ALEXANDER HANCOCK,2026-05-05,15:10:00 EDT,6 ft 01in(s),230 lbs,M,W,46,BRO,BRO,IN,,Bangor Police Department
 2026-05-05T21:00:22,542152,TONYA MARIE ALICEA,2026-05-05,14:40:00 EDT,5 ft 00in(s),150 lbs,F,W,39,BRO,BRO,IN,,Waldo County Sheriff's Department
 2026-05-06T00:00:20,683945,LUIS KURS,2026-05-05,17:40:00 EDT,5 ft 10in(s),150 lbs,M,W,69,BRO,BRO,OUT,2026-05-06,Holden Police Department
