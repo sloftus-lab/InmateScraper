@@ -394,4 +394,5 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-07T05:00:18,842082,LAURIE SHARON ANTONIA BOURASSA,2026-05-06,23:00:00 EDT,5 ft 09in(s),190 lbs,F,W,18,HAZ,BRO,IN,,Bangor Police Department
 2026-05-07T05:00:18,862249,DOVAN CAMPBELL,2026-05-06,22:40:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,B,51,Currently Unavailable,Currently Unavailable,IN,,Bangor Police Department
 2026-05-07T05:00:18,729056,MICHAEL CLARK,2026-05-06,22:30:00 EDT,6 ft 05in(s),220 lbs,M,B,46,BRO,BLK,IN,,Bangor Police Department
-2026-05-07T15:00:27,812322,GORDON F EASTMAN,2026-05-07,09:10:00 EDT,5 ft 11in(s),220 lbs,M,W,41,BRO,BRO,IN,,Penobscot County Sheriff's Office
+2026-05-07T15:00:27,812322,GORDON F EASTMAN,2026-05-07,09:10:00 EDT,5 ft 11in(s),220 lbs,M,W,41,BRO,BRO,OUT,2026-05-07,Penobscot County Sheriff's Office
+2026-05-07T17:00:21,248691,REBECCA SHARAI CASH,2026-05-07,11:05:00 EDT,5 ft 04in(s),135 lbs,F,W,43,BRO,BRO,IN,,Bangor Police Department
