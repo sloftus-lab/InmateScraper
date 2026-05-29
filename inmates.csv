@@ -541,5 +541,5 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-28T16:00:24,12729,DAVID PAUL LIMACHER,2026-05-28,09:35:00 EDT,5 ft 10in(s),230 lbs,M,W,58,HAZ,BRO,IN,,Brewer Police Department
 2026-05-28T18:00:21,318433,KRISTINA MARY ANDREWS,2026-05-28,12:10:00 EDT,5 ft 05in(s),170 lbs,F,W,36,BLU,BLN,IN,,Bangor Police Department
 2026-05-28T18:00:21,236671,MELISSA ANN CURTIS,2026-05-28,11:50:00 EDT,5 ft 06in(s),152 lbs,F,W,50,BLU,BLN,IN,,Brewer Police Department
-2026-05-29T05:00:23,75249,ROBERT C DONLON,2026-05-28,22:40:00 EDT,5 ft 09in(s),145 lbs,M,W,57,BLU,GRY,IN,,Penobscot County Sheriff's Office
+2026-05-29T05:00:23,75249,ROBERT C DONLON,2026-05-28,22:40:00 EDT,5 ft 09in(s),145 lbs,M,W,57,BLU,GRY,OUT,2026-05-29,Penobscot County Sheriff's Office
 2026-05-29T05:00:23,756600,JOHN A BRYANT,2026-05-28,21:20:00 EDT,5 ft 10in(s),189 lbs,M,W,51,BRO,BRO,IN,,Brewer Police Department
