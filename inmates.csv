@@ -549,7 +549,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-05-29T20:00:18,527963,JACOB WILLIAM LOVELY,2026-05-29,13:30:00 EDT,5 ft 07in(s),170 lbs,M,W,27,BRO,BRO,OUT,2026-06-01,Bangor Police Department
 2026-05-29T22:00:18,843562,DAVID BRANDON DUNN,2026-05-29,15:50:00 EDT,5 ft 07in(s),220 lbs,M,W,26,BRO,BRO,OUT,2026-06-02,Bangor Police Department
 2026-05-29T22:00:18,290778,JESSICA MARIE DYER,2026-05-29,15:00:00 EDT,5 ft 06in(s),150 lbs,F,W,42,HAZ,BRO,OUT,2026-06-02,Bangor Police Department
-2026-05-30T01:00:14,391722,ASHLEY NICHOL ARCHIE,2026-05-29,18:30:00 EDT,5 ft 00in(s),120 lbs,F,W,32,BLU,BRO,IN,,Bangor Police Department
+2026-05-30T01:00:14,391722,ASHLEY NICHOL ARCHIE,2026-05-29,18:30:00 EDT,5 ft 00in(s),120 lbs,F,W,32,BLU,BRO,OUT,2026-06-09,Bangor Police Department
 2026-05-30T02:00:18,286583,SCOTT CURTIS CARY,2026-05-29,20:10:00 EDT,5 ft 07in(s),154 lbs,M,W,38,HAZ,BRO,IN,,Bangor Police Department
 2026-05-30T02:00:18,571454,DESTINY M BOGGS,2026-05-29,19:45:00 EDT,5 ft 08in(s),120 lbs,F,W,20,BLU,BLN,OUT,2026-05-30,Penobscot County Sheriff's Office
 2026-05-30T03:00:14,845275,SHANE HILL,2026-05-29,19:45:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,W,56,Currently Unavailable,GRY,IN,,Old Town Police Department
@@ -653,3 +653,4 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-06-09T11:00:19,580875,DAVID M VIEIRA,2026-06-09,04:38:00 EDT,6 ft 02in(s),268 lbs,M,W,45,BLU,BRO,IN,,Bangor Police Department
 2026-06-09T13:00:21,562726,AMY LYNN SMITH,2026-06-09,06:45:00 EDT,5 ft 04in(s),135 lbs,F,W,37,HAZ,BLN,OUT,2026-06-09,Bangor Police Department
 2026-06-09T19:00:22,409333,BARBARA COCHRAN,2026-06-09,12:45:00 EDT,5 ft 02in(s),107 lbs,F,W,68,GRN,GRY,IN,,Lincoln Police Department
+2026-06-09T21:00:19,355450,BENJAMIN SAMUEL BARTON,2026-06-09,15:10:00 EDT,6 ft 00in(s),200 lbs,M,W,42,BRO,BRO,IN,,Bangor Police Department
