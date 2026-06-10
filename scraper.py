@@ -127,7 +127,7 @@ def _field(text: str, label: str) -> str:
 # API
 # ---------------------------------------------------------------------------
 
-def _get_page(page: int) -> dict:
+def _get_page(page: int, retries: int = 4, backoff: int = 15) -> dict:
     url = (
         f"{API_BASE}"
         f"?blogKey=inmates"
@@ -138,8 +138,19 @@ def _get_page(page: int) -> dict:
         f"&page={page}"
     )
     req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.load(resp)
+    for attempt in range(1, retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.load(resp)
+        except urllib.error.HTTPError:
+            raise  # don't retry 4xx errors
+        except Exception as e:
+            if attempt < retries:
+                log.warning("Page %d failed (attempt %d/%d): %s — retrying in %ds...", page, attempt, retries, e, backoff)
+                sleep(backoff)
+                backoff *= 2
+            else:
+                raise
 
 
 def fetch_all_inmates() -> list[dict]:
@@ -153,7 +164,7 @@ def fetch_all_inmates() -> list[dict]:
             log.error("HTTP %d on page %d — stopping.", e.code, page)
             break
         except Exception as e:
-            log.error("Error on page %d: %s", page, e)
+            log.error("Error on page %d after retries: %s", page, e)
             break
 
         entries = data.get("entries", [])
