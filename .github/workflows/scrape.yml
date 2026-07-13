@@ -1,7 +1,9 @@
 name: Scrape Inmate Roster
 
 on:
-  workflow_dispatch:        # triggered by cron-job.org every hour, or manually via GitHub UI
+  schedule:
+    - cron: "0 * * * *"    # every hour via GitHub Actions native scheduler
+  workflow_dispatch:        # also triggerable manually via GitHub UI
 
 permissions:
   contents: write           # needed to commit updated CSV + HTML
