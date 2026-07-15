@@ -886,7 +886,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-07-13T17:52:34,230675,TANYA MARIE WILCOX,2026-07-10,16:00:00 EDT,5 ft 04in(s),180 lbs,F,W,45,HAZ,BRO,IN,,Penobscot County Sheriff's Office
 2026-07-13T17:52:34,112387,JAMES RICHARD WILLIAMS,2026-07-09,18:18:00 EDT,6 ft 02in(s),180 lbs,M,U,64,BLU,BRO,OUT,2026-07-13,Penobscot County Sheriff's Office
 2026-07-13T17:52:34,733734,RENEE S MIRANDA,2026-07-09,18:10:00 EDT,5 ft 05in(s),150 lbs,F,W,59,GRN,GRY,OUT,2026-07-15,Penobscot County Sheriff's Office
-2026-07-13T21:43:32,864940,JAMES TAYLOR,2026-07-13,15:10:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,40,Currently Unavailable,Currently Unavailable,IN,,
+2026-07-13T21:43:32,864940,JAMES TAYLOR,2026-07-13,15:10:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,40,Currently Unavailable,Currently Unavailable,OUT,2026-07-15,
 2026-07-13T23:41:59,820475,HOSANNA G SMITH,2026-07-13,18:15:00 EDT,5 ft 01in(s),115 lbs,F,Currently Unavailable,19,Currently Unavailable,Currently Unavailable,OUT,2026-07-14,Bangor Police Department
 2026-07-13T23:41:59,185881,JOSHUA CHARLES ELDRIDGE,2026-07-13,18:00:00 EDT,5 ft 10in(s),165 lbs,M,W,48,BLU,BRO,IN,,
 2026-07-14T07:02:38,283686,TREVOR ROBERT LABREE,2026-07-14,00:15:00 EDT,5 ft 07in(s),180 lbs,M,W,33,HAZ,BRO,IN,,Old Town Police Department
@@ -900,3 +900,4 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-07-15T17:03:47,332124,BRIDGET DANIELLE NEAL,2026-07-15,11:00:00 EDT,5 ft 04in(s),150 lbs,F,W,40,BLU,BRO,IN,,Dexter Police Department
 2026-07-15T18:53:15,412251,ANITA M MCKINNON,2026-07-15,12:35:00 EDT,5 ft 01in(s),105 lbs,F,W,37,HAZ,BRO,IN,,Penobscot County Sheriff's Office
 2026-07-15T18:53:15,279472,CHAD SHIELDS,2026-07-15,12:15:00 EDT,5 ft 10in(s),200 lbs,M,W,37,BRO,BLN,IN,,Bangor Police Department
+2026-07-15T20:01:13,650693,JACOB ALAN CONLEY,2026-07-15,13:55:00 EDT,5 ft 11in(s),200 lbs,M,W,27,BLU,BRO,IN,,Penobscot County Sheriff's Office
