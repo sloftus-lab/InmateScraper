@@ -883,7 +883,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-07-13T17:52:34,797068,DANIEL PAUL CORBETT,2026-07-11,12:55:00 EDT,5 ft 09in(s),140 lbs,M,W,42,HAZ,BRO,OUT,2026-07-13,Bangor Police Department
 2026-07-13T17:52:34,326523,MATTHEW JOSEPH WHITE,2026-07-10,21:18:00 EDT,5 ft 10in(s),115 lbs,M,W,34,HAZ,BRO,OUT,2026-07-13,Brewer Police Department
 2026-07-13T17:52:34,368049,JESSICA BRANDY FALVEY,2026-07-10,17:30:00 EDT,5 ft 09in(s),150 lbs,F,W,51,BLU,BRO,OUT,2026-07-14,Dexter Police Department
-2026-07-13T17:52:34,230675,TANYA MARIE WILCOX,2026-07-10,16:00:00 EDT,5 ft 04in(s),180 lbs,F,W,45,HAZ,BRO,IN,,Penobscot County Sheriff's Office
+2026-07-13T17:52:34,230675,TANYA MARIE WILCOX,2026-07-10,16:00:00 EDT,5 ft 04in(s),180 lbs,F,W,45,HAZ,BRO,OUT,2026-07-30,Penobscot County Sheriff's Office
 2026-07-13T17:52:34,112387,JAMES RICHARD WILLIAMS,2026-07-09,18:18:00 EDT,6 ft 02in(s),180 lbs,M,U,64,BLU,BRO,OUT,2026-07-13,Penobscot County Sheriff's Office
 2026-07-13T17:52:34,733734,RENEE S MIRANDA,2026-07-09,18:10:00 EDT,5 ft 05in(s),150 lbs,F,W,59,GRN,GRY,OUT,2026-07-15,Penobscot County Sheriff's Office
 2026-07-13T21:43:32,864940,JAMES TAYLOR,2026-07-13,15:10:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,40,Currently Unavailable,Currently Unavailable,OUT,2026-07-15,
