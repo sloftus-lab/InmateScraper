@@ -1014,4 +1014,4 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-08-01T23:46:53,550169,KENNETH THOMAS MORROW,2026-08-01,17:15:00 EDT,5 ft 08in(s),145 lbs,M,W,58,GRN,BRO,IN,,Bangor Police Department
 2026-08-02T05:16:37,782552,MILTJADH GUNELLA,2026-08-01,20:25:00 EDT,6 ft 00in(s),187 lbs,M,W,44,BRO,BLK,IN,,Bangor Police Department
 2026-08-02T08:02:44,856411,JORDAN CHARLES DENNIS,2026-08-02,01:16:00 EDT,6 ft 00in(s),190 lbs,M,W,40,BLU,BLN,IN,,Brewer Police Department
-2026-08-02T14:22:57,585867,AMBER LEE EMERY,2026-08-02,09:20:00 EDT,5 ft 00in(s),111 lbs,F,W,29,HAZ,BRO,IN,,Bangor Police Department
+2026-08-02T14:22:57,585867,AMBER LEE EMERY,2026-08-02,09:20:00 EDT,5 ft 00in(s),111 lbs,F,W,29,HAZ,BRO,OUT,2026-08-02,Bangor Police Department
