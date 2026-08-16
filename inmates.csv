@@ -1116,4 +1116,5 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-08-16T00:36:30,396541,KYLE STEVEN LOVLEY,2026-08-15,19:05:00 EDT,5 ft 11in(s),185 lbs,M,W,36,HAZ,BRO,OUT,2026-08-16,Bangor Police Department
 2026-08-16T00:36:30,260899,TREVOR ALAN CAMERON,2026-08-15,18:40:00 EDT,6 ft 03in(s),180 lbs,M,W,41,BLU,BRO,IN,,Penobscot County Sheriff's Office
 2026-08-16T03:38:18,793447,HEATHER M HARRIS,2026-08-15,22:30:00 EDT,5 ft 07in(s),190 lbs,F,W,38,BLU,RED,IN,,Bangor Police Department
-2026-08-16T03:38:18,519374,NATHAN WHEELER,2026-08-15,22:25:00 EDT,5 ft 05in(s),140 lbs,M,W,23,BLU,BLN,IN,,Bangor Police Department
+2026-08-16T03:38:18,519374,NATHAN WHEELER,2026-08-15,22:25:00 EDT,5 ft 05in(s),140 lbs,M,W,23,BLU,BLN,OUT,2026-08-16,Bangor Police Department
+2026-08-16T05:17:52,717209,CALEB J CROCKER,2026-08-16,00:05:00 EDT,6 ft 00in(s),170 lbs,M,W,24,BRO,BLN,IN,,Newport Police Department
