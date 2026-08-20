@@ -242,7 +242,16 @@ def parse_record(raw: dict, scraped_at: str) -> dict:
 # CSV helpers
 # ---------------------------------------------------------------------------
 
-def load_existing_ids() -> set[str]:
+def _booking_key(inmate_id: str, booking_date: str, booking_time: str) -> str:
+    return f"{inmate_id}|{booking_date}|{booking_time}"
+
+
+def load_existing_keys() -> set[str]:
+    """
+    Keys are (inmate_id, booking_date, booking_time), not inmate_id alone —
+    the jail reuses the same inmate_id across a person's separate bookings,
+    so keying on inmate_id alone would hide anyone booked more than once.
+    """
     seen: set[str] = set()
     if not CSV_FILE.exists():
         return seen
@@ -250,7 +259,7 @@ def load_existing_ids() -> set[str]:
         for row in csv.DictReader(f):
             iid = row.get("inmate_id", "").strip()
             if iid:
-                seen.add(iid)
+                seen.add(_booking_key(iid, row.get("booking_date", ""), row.get("booking_time", "")))
     return seen
 
 
@@ -623,17 +632,20 @@ def run_scrape() -> dict:
         return {"total_fetched": 0, "new_count": 0, "new_rows": [], "error": "No records returned"}
 
     log.info("Total records from API: %d", len(raw_records))
-    existing_ids = load_existing_ids()
-    scraped_at   = datetime.now().isoformat(timespec="seconds")
+    existing_keys = load_existing_keys()
+    scraped_at    = datetime.now().isoformat(timespec="seconds")
 
     new_rows: list[dict] = []
     for raw in raw_records:
         row = parse_record(raw, scraped_at)
         iid = row["inmate_id"]
-        if not iid or iid in existing_ids:
+        if not iid:
+            continue
+        key = _booking_key(iid, row["booking_date"], row["booking_time"])
+        if key in existing_keys:
             continue
         new_rows.append(row)
-        existing_ids.add(iid)
+        existing_keys.add(key)
 
     if new_rows:
         append_rows(new_rows)
