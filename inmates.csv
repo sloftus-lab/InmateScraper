@@ -1206,4 +1206,4 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-08-21T00:37:25,301507,MICHAEL CHRISTOPHER SHAFFER,2026-08-20,19:35:00 EDT,5 ft 05in(s),125 lbs,M,W,42,HAZ,BLK,IN,,Orono Police Department
 2026-08-21T03:40:41,249129,TIMOTHY E KETCH,2026-08-20,22:05:00 EDT,6 ft 02in(s),200 lbs,M,W,42,BRO,BRO,IN,,Penobscot County Sheriff's Office
 2026-08-21T07:34:00,118728,LUCINDA COLE ARCHER,2026-08-21,02:05:00 EDT,5 ft 05in(s),125 lbs,F,W,68,HAZ,BLN,IN,,Bangor Police Department
-2026-08-21T11:15:59,780851,ISAAC L MOORE,2026-08-21,06:14:00 EDT,6 ft 00in(s),191 lbs,M,W,20,BRO,BRO,IN,,Bangor Police Department
+2026-08-21T11:15:59,780851,ISAAC L MOORE,2026-08-21,06:14:00 EDT,6 ft 00in(s),191 lbs,M,W,20,BRO,BRO,OUT,2026-08-21,Bangor Police Department
