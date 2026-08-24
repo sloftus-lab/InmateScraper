@@ -1230,7 +1230,7 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-08-22T14:10:24,808864,XZAVIER WESTON,2026-08-22,09:25:00 EDT,5 ft 11in(s),145 lbs,M,W,28,GRN,BRO,OUT,2026-08-22,Bangor Police Department
 2026-08-22T15:09:56,62695,CRYSTAL MARIE OTIS,2026-08-22,10:00:00 EDT,5 ft 02in(s),122 lbs,F,W,45,GRN,BRO,IN,,Bangor Police Department
 2026-08-22T16:10:32,842890,CONNOR NICHOLS,2026-08-22,11:20:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,24,Currently Unavailable,Currently Unavailable,IN,,
-2026-08-22T16:10:32,86956,JOEL DOUGLAS KYDD,2026-08-22,10:00:00 EDT,5 ft 05in(s),135 lbs,M,W,47,BRO,BLN,IN,,Bangor Police Department
+2026-08-22T16:10:32,86956,JOEL DOUGLAS KYDD,2026-08-22,10:00:00 EDT,5 ft 05in(s),135 lbs,M,W,47,BRO,BLN,OUT,2026-08-24,Bangor Police Department
 2026-08-22T21:10:48,121942,RICHARD JAMES JOSEPH HATCH,2026-08-22,16:10:00 EDT,5 ft 10in(s),140 lbs,M,W,46,BRO,BRO,IN,,Bangor Police Department
 2026-08-23T02:17:37,756944,JACOB CHARLES SPINK,2026-08-22,20:20:00 EDT,5 ft 11in(s),200 lbs,M,U,34,HAZ,BRO,IN,,Penobscot County Sheriff's Office
 2026-08-23T06:21:18,848277,ERNEST JOSEPH LOLA,2026-08-23,01:15:00 EDT,6 ft 02in(s),150 lbs,M,I,64,BRO,BRO,OUT,2026-08-24,Old Town Police Department
@@ -1239,3 +1239,4 @@ scraped_at,inmate_id,name,booking_date,booking_time,height,weight,gender,race,ag
 2026-08-23T22:10:26,866854,JASON CRAMER,2026-08-23,17:20:00 EDT,Weight: Currently Unavailable,Currently Unavailable,M,Currently Unavailable,54,Currently Unavailable,Currently Unavailable,OUT,2026-08-24,
 2026-08-24T03:43:31,469013,ALEXANDER C LAIDMAN,2026-08-23,22:20:00 EDT,5 ft 08in(s),170 lbs,M,W,40,BRO,BRO,OUT,2026-08-24,Hampden Police Department
 2026-08-24T05:28:42,537142,JENNIFER CHRISTIE-NOEL SJOSTROM,2026-08-24,23:50:00 EDT,5 ft 01in(s),150 lbs,F,W,40,BLU,BRO,OUT,2026-08-24,Bangor Police Department
+2026-08-24T20:17:31,240760,DANIEL J KING,2026-08-24,14:50:00 EDT,6 ft 01in(s),146 lbs,M,W,43,BLU,BRO,IN,,Bangor Police Department
