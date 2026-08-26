@@ -42,6 +42,6 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add inmates.csv roster.html docs/index.html
+          git add inmates.csv roster.html docs/index.html pending_releases.json
           git diff --staged --quiet || git commit -m "scrape: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push

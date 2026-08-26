@@ -39,8 +39,9 @@ from time import sleep
 API_BASE  = "https://blogapi.myocv.com/prod/paginatedBlog/a53704401"
 API_KEY   = "SbRiICL5la3daytBtRL2K26xorlmbPXZ3jPQLVzR"
 API_LIMIT = 100
-CSV_FILE  = Path(__file__).parent / "inmates.csv"
-LOG_FILE  = Path(__file__).parent / "scraper.log"
+CSV_FILE     = Path(__file__).parent / "inmates.csv"
+LOG_FILE     = Path(__file__).parent / "scraper.log"
+PENDING_FILE = Path(__file__).parent / "pending_releases.json"
 
 # Email — read from environment variables (set in .env locally, GitHub Secrets in Actions)
 EMAIL_FROM     = os.environ.get("INMATE_EMAIL_FROM", "")
@@ -273,46 +274,87 @@ def append_rows(rows: list[dict]) -> int:
     return len(rows)
 
 
-def mark_released(active_ids: set[str]) -> list[dict]:
+def load_pending() -> dict[str, str]:
+    if not PENDING_FILE.exists():
+        return {}
+    with open(PENDING_FILE, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_pending(pending: dict[str, str]) -> None:
+    with open(PENDING_FILE, "w", encoding="utf-8") as f:
+        json.dump(pending, f, indent=2, sort_keys=True)
+
+
+def mark_released(active_ids: set[str], active_bookings: dict[str, tuple[str, str]]) -> list[dict]:
     """
-    Compare active_ids (currently in jail) against CSV rows marked IN.
-    Any row marked IN that is no longer active gets stamped OUT with today's date.
-    Returns list of newly-released rows.
+    Compare active_ids (currently in jail per this poll) against CSV rows marked IN.
+
+    A single missing poll doesn't finalize a release — the source API has brief
+    listing gaps — so a miss is only recorded as "pending" the first time; it's
+    finalized as OUT only if the inmate is still missing on the *next* poll.
+    Any row already marked OUT whose exact booking (inmate_id + booking_date +
+    booking_time) reappears in the active feed is reverted back to IN, which
+    self-heals any release that was (incorrectly) finalized on a prior gap.
+
+    Returns list of newly-finalized-released rows.
     """
     if not CSV_FILE.exists():
         return []
 
     today = datetime.now().strftime("%Y-%m-%d")
-    rows = []
-    released = []
+    pending = load_pending()
 
     with open(CSV_FILE, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            iid = row.get("inmate_id", "").strip()
-            if (
-                iid
-                and row.get("custody_status") == "IN"
-                and iid not in active_ids
-                and not row.get("release_date")
-            ):
+        rows = list(csv.DictReader(f))
+
+    released = []
+    reactivated = []
+    still_pending: dict[str, str] = {}
+
+    for row in rows:
+        iid = row.get("inmate_id", "").strip()
+        if not iid:
+            continue
+
+        if row.get("custody_status") == "IN" and not row.get("release_date"):
+            if iid in active_ids:
+                pending.pop(iid, None)
+            elif iid in pending:
                 row["custody_status"] = "OUT"
                 row["release_date"]   = today
                 released.append(row)
-            rows.append(row)
+            else:
+                still_pending[iid] = row["name"]
 
-    if released:
-        # Rewrite the whole CSV with updated rows
+        elif row.get("custody_status") == "OUT" and row.get("release_date"):
+            booking = (row.get("booking_date", ""), row.get("booking_time", ""))
+            if active_bookings.get(iid) == booking:
+                row["custody_status"] = "IN"
+                row["release_date"]   = ""
+                reactivated.append(row)
+
+    pending = still_pending
+
+    if released or reactivated:
         with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(rows)
+
+    if released:
         log.info("Marked %d inmate(s) as released.", len(released))
         for r in released[:5]:
             log.info("  Released: %s (booked %s)", r["name"], r["booking_date"])
         if len(released) > 5:
             log.info("  … and %d more", len(released) - 5)
 
+    if reactivated:
+        log.info("Reverted %d falsely-released inmate(s) back to IN.", len(reactivated))
+        for r in reactivated[:5]:
+            log.info("  Reactivated: %s (booked %s)", r["name"], r["booking_date"])
+
+    save_pending(pending)
     return released
 
 
@@ -636,11 +678,13 @@ def run_scrape() -> dict:
     scraped_at    = datetime.now().isoformat(timespec="seconds")
 
     new_rows: list[dict] = []
+    active_bookings: dict[str, tuple[str, str]] = {}
     for raw in raw_records:
         row = parse_record(raw, scraped_at)
         iid = row["inmate_id"]
         if not iid:
             continue
+        active_bookings[iid] = (row["booking_date"], row["booking_time"])
         key = _booking_key(iid, row["booking_date"], row["booking_time"])
         if key in existing_keys:
             continue
@@ -662,7 +706,7 @@ def run_scrape() -> dict:
 
     # Check for releases — anyone marked IN who isn't in the current API response
     active_ids = {raw.get("inmateID", "") for raw in raw_records if raw.get("inmateID")}
-    released_rows = mark_released(active_ids)
+    released_rows = mark_released(active_ids, active_bookings)
 
     generate_html()
 
