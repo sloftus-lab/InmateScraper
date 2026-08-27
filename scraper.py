@@ -76,6 +76,7 @@ CSV_FIELDS = [
     "custody_status",
     "release_date",
     "arresting_agency",
+    "charges",
 ]
 
 log = logging.getLogger(__name__)
@@ -181,6 +182,39 @@ def fetch_all_inmates() -> list[dict]:
     return all_records
 
 
+DETAIL_URL = "https://www.penobscot-sheriff.net/inmates/{entry_id}"
+
+
+def fetch_charges(entry_id: str, retries: int = 3, backoff: int = 5) -> str:
+    """
+    The bulk roster API's chargeArray is just a static placeholder
+    (["chargeCode","chargeDescription","chargeDate"]) — no real charge data.
+    The site's per-inmate detail page embeds real charges in its Next.js
+    payload as escaped HTML, e.g.:
+      Charge Code: TPOT<br/>Charge Description: THEFT, PROPERTY, OTHER<br/>Charge Date: ...
+    """
+    if not entry_id:
+        return ""
+    req = urllib.request.Request(
+        DETAIL_URL.format(entry_id=entry_id),
+        headers={"user-agent": HEADERS["user-agent"]},
+    )
+    for attempt in range(1, retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                html = resp.read().decode("utf-8", errors="replace")
+            html = html.replace("\\u003c", "<").replace("\\u003e", ">").replace("\\/", "/")
+            descriptions = re.findall(r"Charge Description:\s*([^<]+?)<br", html)
+            return "; ".join(d.strip() for d in descriptions)
+        except Exception as e:
+            if attempt < retries:
+                sleep(backoff)
+                backoff *= 2
+            else:
+                log.warning("Charge fetch failed for entry %s: %s", entry_id, e)
+                return ""
+
+
 # ---------------------------------------------------------------------------
 # Record normalisation
 # ---------------------------------------------------------------------------
@@ -207,15 +241,6 @@ def parse_record(raw: dict, scraped_at: str) -> dict:
             booking_date = datetime.strptime(m.group(1), "%m/%d/%Y").strftime("%Y-%m-%d")
             booking_time = m.group(2) + (" " + m.group(3) if m.group(3) else "")
 
-    charge_array = raw.get("chargeArray", [])
-    if isinstance(charge_array, list) and charge_array and isinstance(charge_array[0], dict):
-        charges = "; ".join(
-            c.get("chargeDescription") or c.get("charge", "")
-            for c in charge_array if isinstance(c, dict)
-        )
-    else:
-        charges = _field(text, "Charge") or _field(text, "Charges") or _field(text, "Offense")
-
     arresting = _field(text, "Arresting Agency")
     if arresting.lower() == "currently unavailable":
         arresting = ""
@@ -236,6 +261,11 @@ def parse_record(raw: dict, scraped_at: str) -> dict:
         "custody_status":   custody,
         "release_date":     "",
         "arresting_agency": arresting,
+        "charges":          "",
+        # Not a CSV column (extrasaction="ignore" drops it) — used to fetch
+        # charges from the per-inmate detail page, which has real charge
+        # data the bulk roster API doesn't expose.
+        "entry_id":         (raw.get("_id") or {}).get("$id", ""),
     }
 
 
@@ -262,6 +292,28 @@ def load_existing_keys() -> set[str]:
             if iid:
                 seen.add(_booking_key(iid, row.get("booking_date", ""), row.get("booking_time", "")))
     return seen
+
+
+def migrate_csv_schema() -> None:
+    """
+    Add newly-introduced CSV_FIELDS columns (e.g. "charges") to an existing
+    file's header. Without this, append_rows would write rows with more
+    columns than the on-disk header declares, misaligning every column read
+    back afterward. Old rows get "" for the new column via DictWriter's
+    restval. No-op once the header is already current.
+    """
+    if not CSV_FILE.exists():
+        return
+    with open(CSV_FILE, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames and set(CSV_FIELDS).issubset(reader.fieldnames):
+            return
+        rows = list(reader)
+    with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+    log.info("Migrated inmates.csv header to current schema.")
 
 
 def append_rows(rows: list[dict]) -> int:
@@ -415,6 +467,7 @@ def generate_html():
           <td>{status_badge}</td>
           <td>{e(r.get('release_date',''))}</td>
           <td>{e(r.get('arresting_agency',''))}</td>
+          <td>{e(r.get('charges',''))}</td>
           <td class="text-muted small">{e(r.get('scraped_at',''))}</td>
         </tr>""")
 
@@ -492,7 +545,7 @@ def generate_html():
               <th>Name</th><th>Booking Date</th><th>Time</th><th>Age</th>
               <th>Gender</th><th>Race</th><th>Height</th><th>Weight</th>
               <th>Eyes</th><th>Hair</th><th>Status</th><th>Released</th>
-              <th>Arresting Agency</th><th>Scraped At</th>
+              <th>Arresting Agency</th><th>Charges</th><th>Scraped At</th>
             </tr>
           </thead>
           <tbody>{''.join(rows_html)}</tbody>
@@ -556,6 +609,7 @@ def send_email(new_rows: list[dict], released_rows=None):
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['gender']}</td>
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['height']}</td>
           <td style="padding:6px 12px;border-bottom:1px solid #eee">{r['weight']}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #eee">{r.get('charges','')}</td>
         </tr>""" for r in rows)
         return f"""
       <table style="border-collapse:collapse;width:100%;font-size:14px">
@@ -568,6 +622,7 @@ def send_email(new_rows: list[dict], released_rows=None):
             <th style="padding:8px 12px;text-align:left">Gender</th>
             <th style="padding:8px 12px;text-align:left">Height</th>
             <th style="padding:8px 12px;text-align:left">Weight</th>
+            <th style="padding:8px 12px;text-align:left">Charges</th>
           </tr>
         </thead>
         <tbody>{row_cells}</tbody>
@@ -663,6 +718,7 @@ def run_scrape() -> dict:
       {total_fetched, new_count, new_rows, error}
     """
     log.info("=== Scrape started: %s ===", datetime.now().isoformat(timespec="seconds"))
+    migrate_csv_schema()
     try:
         raw_records = fetch_all_inmates()
     except Exception as e:
@@ -690,6 +746,10 @@ def run_scrape() -> dict:
             continue
         new_rows.append(row)
         existing_keys.add(key)
+
+    for row in new_rows:
+        row["charges"] = fetch_charges(row["entry_id"])
+        sleep(0.3)
 
     if new_rows:
         append_rows(new_rows)
