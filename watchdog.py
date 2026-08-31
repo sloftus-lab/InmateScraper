@@ -13,7 +13,6 @@ Run:   python3 watchdog.py
 import json
 import os
 import smtplib
-import sys
 import urllib.request
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
@@ -71,11 +70,17 @@ def send_alert(minutes_since: float, last_run_url: str) -> None:
 
 
 def main() -> None:
+    # Deliberately exits 0 whenever it successfully detects and alerts on a
+    # gap -- that's the watchdog doing its job, not a CI failure. Exiting 1
+    # here would make GitHub also fire its own "run failed" notification on
+    # top of the alert email below, doubling up on every real gap. A non-zero
+    # exit is reserved for the watchdog itself erroring out (see the
+    # unhandled-exception path, which already exits non-zero on its own).
     run = latest_successful_scrape()
     if not run:
         print("No successful runs found at all.")
         send_alert(float("inf"), f"https://github.com/{REPO}/actions/workflows/scrape.yml")
-        sys.exit(1)
+        return
 
     created_at = datetime.fromisoformat(run["created_at"].replace("Z", "+00:00"))
     minutes_since = (datetime.now(timezone.utc) - created_at).total_seconds() / 60
@@ -83,7 +88,7 @@ def main() -> None:
 
     if minutes_since > THRESHOLD:
         send_alert(minutes_since, run["html_url"])
-        sys.exit(1)
+        return
 
     print("OK — within threshold.")
 

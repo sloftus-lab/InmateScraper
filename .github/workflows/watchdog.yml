@@ -2,7 +2,11 @@ name: Scraper Watchdog
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # check twice an hour that the hourly scrape is actually landing
+    # Once an hour, offset to :23 -- avoids the top-of-hour (:00) congestion
+    # spike that scrape.yml's own schedule fires on. Scrapes gaps became
+    # dramatically worse right after this workflow was added running every
+    # 30 min at :00/:30, so this also halves its added scheduled-job volume.
+    - cron: "23 * * * *"
   workflow_dispatch:
 
 permissions:
