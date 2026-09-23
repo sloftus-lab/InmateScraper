@@ -438,6 +438,13 @@ def generate_html():
     # Newest scraped_at timestamp = records added in the last run
     last_scraped = max((r.get("scraped_at", "") for r in inmates), default="")
 
+    # Distinct booking months present, newest first, for the month filter dropdown
+    months = sorted({r["booking_date"][:7] for r in inmates if len(r.get("booking_date", "")) >= 7}, reverse=True)
+    month_options = "".join(
+        f'<option value="{m}">{datetime.strptime(m, "%Y-%m").strftime("%B %Y")}</option>'
+        for m in months
+    )
+
     rows_html = []
     for r in inmates:
         is_today = r.get("booking_date") == today
@@ -536,7 +543,16 @@ def generate_html():
     <span class="text-muted small">Auto-refreshes every hour &nbsp;·&nbsp; <a href="https://github.com/sloftus-lab/InmateScraper/actions" target="_blank" class="alert-link">Run manually on GitHub</a></span>
   </div>
   <div class="card shadow-sm mb-5">
-    <div class="card-header"><strong>Inmate Records</strong></div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Inmate Records</strong>
+      <div class="d-flex align-items-center gap-2">
+        <label for="month-filter" class="small text-muted mb-0">Booking month:</label>
+        <select id="month-filter" class="form-select form-select-sm" style="width:auto">
+          <option value="">All months</option>
+          {month_options}
+        </select>
+      </div>
+    </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table id="inmates-table" class="table table-hover table-sm mb-0 align-middle">
@@ -564,11 +580,18 @@ def generate_html():
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
-  $('#inmates-table').DataTable({{
+  var inmatesTable = $('#inmates-table').DataTable({{
     order: [[1,'desc'],[2,'desc']],
     pageLength: 25,
     language: {{ search: 'Filter:' }}
   }});
+
+  $.fn.dataTable.ext.search.push(function(settings, rowData) {{
+    var month = $('#month-filter').val();
+    return !month || rowData[1].indexOf(month) === 0;
+  }});
+
+  $('#month-filter').on('change', function() {{ inmatesTable.draw(); }});
 </script>
 </body>
 </html>"""
