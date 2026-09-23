@@ -24,7 +24,7 @@
 <nav class="navbar navbar-dark mb-4">
   <div class="container-fluid">
     <span class="navbar-brand fw-bold">&#x1F512; Penobscot County Sheriff — Inmate Roster</span>
-    <span class="text-light small">Generated: 2026-09-23 12:24:10</span>
+    <span class="text-light small">Generated: 2026-09-23 14:40:04</span>
   </div>
 </nav>
 <div class="container-fluid px-4">
@@ -38,7 +38,7 @@
     <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Currently In Custody</div>
-        <div class="display-6 text-danger">225</div>
+        <div class="display-6 text-danger">223</div>
       </div>
     </div>
     <div class="col-sm-3">
@@ -50,20 +50,29 @@
     <div class="col-sm-3">
       <div class="card stat-card shadow-sm text-center p-3">
         <div class="text-muted small mb-1">Jail Capacity (157)</div>
-        <div class="display-6 text-danger">143%</div>
+        <div class="display-6 text-danger">142%</div>
         <div style="background:#e9ecef;border-radius:6px;height:10px;margin-top:8px">
           <div style="background:var(--bs-danger);width:100%;height:10px;border-radius:6px"></div>
         </div>
-        <div class="text-muted small mt-1">225 / 157</div>
+        <div class="text-muted small mt-1">223 / 157</div>
       </div>
     </div>
   </div>
   <div class="alert alert-info py-2 d-flex justify-content-between align-items-center">
-    <span>&#x1F551; Last updated: <strong>2026-09-23 12:24:10</strong></span>
+    <span>&#x1F551; Last updated: <strong>2026-09-23 14:40:04</strong></span>
     <span class="text-muted small">Auto-refreshes every hour &nbsp;·&nbsp; <a href="https://github.com/sloftus-lab/InmateScraper/actions" target="_blank" class="alert-link">Run manually on GitHub</a></span>
   </div>
   <div class="card shadow-sm mb-5">
-    <div class="card-header"><strong>Inmate Records</strong></div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Inmate Records</strong>
+      <div class="d-flex align-items-center gap-2">
+        <label for="month-filter" class="small text-muted mb-0">Booking month:</label>
+        <select id="month-filter" class="form-select form-select-sm" style="width:auto">
+          <option value="">All months</option>
+          <option value="2026-09">September 2026</option><option value="2026-08">August 2026</option><option value="2026-07">July 2026</option><option value="2026-06">June 2026</option><option value="2026-05">May 2026</option><option value="2026-04">April 2026</option><option value="2026-03">March 2026</option><option value="2026-02">February 2026</option><option value="2026-01">January 2026</option><option value="2025-12">December 2025</option><option value="2025-11">November 2025</option><option value="2025-10">October 2025</option><option value="2025-09">September 2025</option><option value="2025-08">August 2025</option><option value="2025-07">July 2025</option><option value="2025-06">June 2025</option><option value="2025-05">May 2025</option><option value="2025-03">March 2025</option><option value="2025-02">February 2025</option><option value="2024-12">December 2024</option><option value="2024-11">November 2024</option><option value="2024-10">October 2024</option><option value="2024-09">September 2024</option><option value="2024-06">June 2024</option><option value="2024-05">May 2024</option><option value="2024-02">February 2024</option>
+        </select>
+      </div>
+    </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table id="inmates-table" class="table table-hover table-sm mb-0 align-middle">
@@ -11018,8 +11027,8 @@
           <td>130 lbs</td>
           <td>BLU</td>
           <td>BLN</td>
-          <td><span class="badge bg-danger">IN</span></td>
-          <td></td>
+          <td><span class="badge bg-success">OUT</span></td>
+          <td>2026-09-23</td>
           <td></td>
           <td></td>
           <td class="text-muted small">2026-06-08T23:00:18</td>
@@ -17852,8 +17861,8 @@
           <td>204 lbs</td>
           <td>HAZ</td>
           <td>BRO</td>
-          <td><span class="badge bg-danger">IN</span></td>
-          <td></td>
+          <td><span class="badge bg-success">OUT</span></td>
+          <td>2026-09-23</td>
           <td>Bangor Police Department</td>
           <td></td>
           <td class="text-muted small">2026-08-05T19:12:02</td>
@@ -25693,11 +25702,18 @@
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
-  $('#inmates-table').DataTable({
+  var inmatesTable = $('#inmates-table').DataTable({
     order: [[1,'desc'],[2,'desc']],
     pageLength: 25,
     language: { search: 'Filter:' }
   });
+
+  $.fn.dataTable.ext.search.push(function(settings, rowData) {
+    var month = $('#month-filter').val();
+    return !month || rowData[1].indexOf(month) === 0;
+  });
+
+  $('#month-filter').on('change', function() { inmatesTable.draw(); });
 </script>
 </body>
 </html>
